@@ -1,0 +1,197 @@
+@import url('https://fonts.googleapis.com/css?family=Acme&display=swap');
+
+* {
+    font-family: 'Acme', sans-serif;
+	outline: none;
+}
+
+/* SECTION: Colors */
+* {
+	color: silver;
+}
+html {
+	background-color: #475767;
+}
+hr {
+	background-color: silver;
+}
+.navbar .btn {
+	outline-color: silver;
+}
+/* End section */
+
+/* SECTION: Sidebars on home page */
+#side_left {
+	font-size: 28px;
+	margin-bottom: 24px;
+	margin-top: 16px;
+	position: absolute;
+}
+@media screen and (min-width: 801px) {
+	#side_left {
+		display: block;
+		left: 16px;
+		position: absolute;
+		top: 16px;
+		width: 256px;
+	}
+	#side_left *:first-child {
+		margin: 0 auto;
+	}
+}
+@media screen and (max-width: 800px) {
+	#side_left {
+		text-align: center;
+		top: 800px;
+		width: 100%;
+	}
+}
+/* End section */
+
+
+/* SECTION: Menus */
+hr {
+    border: none;
+    height: 6px;
+    margin-bottom: 0;
+}
+.navbar {
+	/*border: 4px solid silver;*/
+	display: block;
+	font-size: 40px;
+	height: 500px;
+    left: 10%;
+	margin: 0 auto;
+	overflow: hidden;
+	text-align: center;
+	transition: height .6s cubic-bezier(.6, .2, .2, 1);
+}
+.navbar .btn {
+	/*font-size: 48px;*/
+	display: inline-block;
+	margin: 8px 0px;
+	outline: 4px solid;
+	overflow: hidden;
+	position: relative;
+	transition: outline, padding .2s linear;
+}
+.navbar .btn:hover {
+	cursor: pointer;
+	padding: 0px 16px;
+}
+.navbar .btn::before {
+	content: ">";
+	display: inline-block;
+	opacity: 0;
+	position: absolute;
+	transition: left .2s linear, opacity .2s linear;
+	left: 20px;
+}
+.navbar .btn:hover::before {
+	display: inline-block;
+	opacity: 1;
+	transition: left .2s linear, opacity .3s linear;
+    left: 0;
+}
+.navbar .btn::after {
+	content: "<";
+	display: inline-block;
+	opacity: 0;
+	padding-right: 2px;
+	position: absolute;
+	transition: right .2s linear, opacity .2s linear;
+	right: 20px;
+}
+.navbar .btn:hover::after {
+	display: inline-block;
+	opacity: 1;
+	transition: right .2s linear, opacity .3s linear;
+	right: 0;
+}
+.navbar .btn:active {
+	outline-color: lightblue;
+	color: lightblue;
+}
+
+.navbar.active {
+	height: 0;
+}
+
+#navbar {
+	margin-top: 15px;
+}
+
+#subnav_desc {
+	font-size: 24px;
+}
+
+#subnav_title {
+	outline: none;
+	padding: 4px 24px;
+	text-decoration: underline;
+}
+@media screen and (min-width: 701px) {
+	hr {
+		width: 55%;
+	}
+	.navbar {
+		width: 55%;
+	}
+}
+@media screen and (max-width: 700px) {
+	hr {
+		width: 90%;
+	}
+	.navbar {
+		width: 100%;
+	}
+}
+/* End section */
+
+
+/* SECTION: Title */
+.title {
+	font-size: 140px;
+    line-height: 64px;
+    margin-top: 5%;
+	text-decoration: none;
+	transition: color .5s;
+	width: 100%
+}
+.title_medium {
+	font-size: 54px;
+	margin: 10px 0;
+}
+.title_tilt {
+	animation: title_tilt 1.2s ease-out 0s 1 forwards;
+	/*transform: perspective(140px) rotateX(30deg);*/
+	/*font-family: serif;*/
+}
+.title_tiny {
+    font-size: 30px;
+}
+@keyframes title_tilt {
+    0% {
+        transform: none;
+    }
+    100% {
+        transform: perspective(140px) rotateX(30deg);
+    }
+}
+/* End section */
+
+body, html {
+    margin: 0;
+	overflow-x: hidden;
+}
+
+#content {
+	text-align: center;
+}
+
+.timeline_container {
+    display: none;
+}
+.timeline_container:target {
+    display: block;
+}

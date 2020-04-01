@@ -1,0 +1,59 @@
+{
+    "avernus (thuud)": {
+        "description": "Deb goes to hell. Literally.",
+        "description_full": "",
+        "worldanvil_link": "https://www.worldanvil.com/w/thuud-taco3000",
+        "places": {},
+        "party": {
+        }, 
+        "events": {}
+    },
+
+
+    "drirt": {
+        "description": "A homebrew world full of bizzare occurences and tenuous alliances.",
+        "description_full": "",
+        "worldanvil_link": "https://www.worldanvil.com/w/drirt-jayspaz",
+        "places": {},
+        "party": {
+            "Chomps Lewis" :{
+                "description": "",
+                "status": "Alive"
+            },
+            "T. Zevomah" :{
+                "description": "",
+                "status": "Alive"
+            },
+            "Adid Bitty" :{
+                "description": "",
+                "status": "Dead"
+            },
+            "Richard Long" :{
+                "description": "",
+                "status": "Retired"
+            },
+            "Jo Bo": {
+                "description": "",
+                "status": "Unknown"
+            },
+            "Light": {
+                "description": "",
+                "status": "Alive"
+            }
+        },
+        "events": {}
+    },
+
+
+    "dismas": {
+        "description": "Deb goes epic level!<br>Nothing is as it seems in this world...",
+        "description_full": "",
+        "worldanvil_link": "https://www.worldanvil.com/w/dismas-chag",
+        "places": {},
+        "party": {
+        },
+        "events": {}
+    },
+
+    "quotes": []
+}
