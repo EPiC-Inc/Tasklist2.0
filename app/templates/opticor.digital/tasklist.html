@@ -28,7 +28,13 @@
   <button id="revoke-access-button">Revoke Access</button> <br>
   <p id='auth-status'></p>
   
-  <button id="hidden-tasks-button">Show Hidden Tasks</button>
+  <div id="tasklist-controls">
+    <button id="hidden-tasks-button">Show Hidden Tasks</button>
+    <span style="width: 56px;"></span>
+    Viewing list: <select id="selected-tasklist">
+      <option value="*">All</option>
+    </select>
+  </div>
 
   <div id="main-tasks-div"></div>
 </body>
@@ -36,6 +42,7 @@
 <script>
   var tasklists = {};
   var showHiddenTasks = false;
+  var DISPLAYMODE = "block"
 
   // This was stolen from the Google documentation.
   // Some of it was, anyway
@@ -44,6 +51,8 @@
   var PATH = "https://www.googleapis.com/tasks/v1/";
 
   function handleClientLoad() {
+    // Hide tasklist control panel because of bugs
+    $("#tasklist-controls").css('display', 'none');
     // Load the API's client and auth2 modules.
     // Call the initClient function after the modules load.
     console.log("Page loaded; loading Google client")
@@ -82,15 +91,47 @@
         revokeAccess();
       });
 
+      //ANCHOR: Show / hide tasks
       $("#hidden-tasks-button").click(function() {
         if (showHiddenTasks) {
-          $('#hidden-tasks-button').html("Hide Tasks");
+          $('#hidden-tasks-button').html("Show Hidden Tasks");
           showHiddenTasks = false;
         } else {
-          $('#hidden-tasks-button').html("Show Hidden Tasks");
+          $('#hidden-tasks-button').html("Hide Tasks");
           showHiddenTasks = true;
         }
+        for (var id in tasklists) {
+          for (var taskId in tasklists[id].tasks) {
+            var currentTask = tasklists[id].tasks[taskId]
+            //console.log(currentTask);
+            if (currentTask.hidden & showHiddenTasks) {
+              $("#"+taskId).css("display", DISPLAYMODE);
+            } else if (currentTask.hidden & !showHiddenTasks) {
+              $("#"+taskId).css("display", "none");
+            }
+          }
+        }
       });
+
+      //ANCHOR: Tasklist selection
+      $("#selected-tasklist").change(function(a) {
+        if ($("#selected-tasklist").val() == "*") {
+          // If the user wants to see all tasklists
+          for (var id in tasklists) {
+            $("#"+id).css("display", DISPLAYMODE);
+          }
+        } else {
+          // If the user wants to see a specific list
+          for (var id in tasklists) {
+            if (id == $("#selected-tasklist").val()) {
+              $("#"+id).css("display", DISPLAYMODE);
+            } else {
+              $("#"+id).css("display", "none");
+            }
+          }
+        }
+      })
+  
     });
   }
 
@@ -127,9 +168,8 @@
 
     if (isAuthorized) {
       $('#signin-button').html('Sign out');
-      $('#revoke-access-button').css('display', 'inline-block');
-      $('#auth-status').html('Welcome, ' + profile.getGivenName() + "! (" + profile.getEmail().substring(0, 5) + "*".repeat(profile.getEmail().length - 5) + ")");
-      $("#hidden-tasks-button").css('display', 'inline-block');
+      $('#revoke-access-button').css('display', DISPLAYMODE);
+      $('#auth-status').html('Welcome, ' + profile.getGivenName() + "! (" + profile.getEmail().substring(0, 6) + "*".repeat(profile.getEmail().length - 6) + ")");
       
       //ANCHOR: This runs on sign in, even between page loads
       getTasks();
@@ -139,7 +179,7 @@
       $('#revoke-access-button').css('display', 'none');
       $('#auth-status').html('You have not authorized this app or you are ' +
           'signed out.');
-      $("#hidden-tasks-button").css('display', 'none');
+      $("#tasklist-controls").css('display', 'none');
     }
   }
 
@@ -172,14 +212,16 @@
           title: tList.title,
           tasks: {}
         };
-        
+
+        // Add the list to the list selector
+        $("<option value='"+tList.id+"'>"+tList.title+"</option>").appendTo("#selected-tasklist");
+
         // For each task in the tasklist, write out some details to console
         gapi.client.request({
           'path':PATH+'lists/'+tList.id+"/tasks?showHidden=true",
           'body': {
             "showCompleted": true,
-            "showHidden": true,
-            "showDeleted": true
+            "showHidden": true
           }
         }).then(res => {
           if (res.result.items) {
@@ -208,6 +250,9 @@
         });
       });
     });
+
+    // Show the hidden-tasks button
+    $("#tasklist-controls").css('display', DISPLAYMODE);
   }
 </script>
 
