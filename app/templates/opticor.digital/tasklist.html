@@ -18,7 +18,8 @@
 <head>
   <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
   <meta content="utf-8" http-equiv="encoding">
-  <title>Test App</title>
+  <link rel="stylesheet" href="/styles/tasklist/style.css" type="text/css">
+  <title>Tasklist2.0 by EPiC_Inc</title>
 </head>
 
 <body>
@@ -29,20 +30,27 @@
   <p id='auth-status'></p>
   
   <div id="tasklist-controls">
-    <button id="hidden-tasks-button">Show Hidden Tasks</button>
-    <span style="width: 56px;"></span>
-    Viewing list: <select id="selected-tasklist">
-      <option value="*">All</option>
+    <button id="hidden-tasks-button">Show Completed Tasks</button>
+    <span style="width: 16px;display: inline-block;"> </span>
+    List: <select id="selected-tasklist">
+      <option value="*" selected="selected">All</option>
+    </select>
+    <span style="width: 16px;display: inline-block;"> </span>
+    Display: <select id="sort-by">
+      <option value="default" selected="selected">Default</option>
+      <option value="kanban">Kanban</option>
+      <option value="planner">Planner</option>
     </select>
   </div>
+  </div>
 
-  <div id="main-tasks-div"></div>
+  <div id="main-tasks-div" class="default"></div>
 </body>
 
 <script>
   var tasklists = {};
   var showHiddenTasks = false;
-  var DISPLAYMODE = "block"
+  var DISPLAYMODE = "inline-block";
 
   // This was stolen from the Google documentation.
   // Some of it was, anyway
@@ -94,10 +102,10 @@
       //ANCHOR: Show / hide tasks
       $("#hidden-tasks-button").click(function() {
         if (showHiddenTasks) {
-          $('#hidden-tasks-button').html("Show Hidden Tasks");
+          $('#hidden-tasks-button').html("Show Completed Tasks");
           showHiddenTasks = false;
         } else {
-          $('#hidden-tasks-button').html("Hide Tasks");
+          $('#hidden-tasks-button').html("Hide Completed Tasks");
           showHiddenTasks = true;
         }
         for (var id in tasklists) {
@@ -130,8 +138,14 @@
             }
           }
         }
-      })
-  
+      });
+
+      //ANCHOR: Sort-by selection
+      $("#sort-by").change(function() {
+        $("#main-tasks-div").removeClass();
+        $("#main-tasks-div").addClass($("#sort-by").val());
+      });
+
     });
   }
 
@@ -169,10 +183,14 @@
     if (isAuthorized) {
       $('#signin-button').html('Sign out');
       $('#revoke-access-button').css('display', DISPLAYMODE);
+      $("#tasklist-controls").css('display', DISPLAYMODE);
       $('#auth-status').html('Welcome, ' + profile.getGivenName() + "! (" + profile.getEmail().substring(0, 6) + "*".repeat(profile.getEmail().length - 6) + ")");
       
       //ANCHOR: This runs on sign in, even between page loads
       getTasks();
+      if (getUrlParameter("display")) {
+        $("#sort-by").val(getUrlParameter("display")).change();
+      }
 
     } else {
       $('#signin-button').html('Sign In/Authorize');
@@ -200,7 +218,7 @@
     }).then(res => {
       // For each tasklist, write out some details to console
       res.result.items.forEach(tList => {
-        console.log(tList.title + " | " + tList.id);
+        //console.log(tList.title + " | " + tList.id);
 
         // Append a visual representation of the list to main-tasks-div
         $("<div class='tasklist' id='"+tList.id+"'>" +
@@ -218,18 +236,19 @@
 
         // For each task in the tasklist, write out some details to console
         gapi.client.request({
-          'path':PATH+'lists/'+tList.id+"/tasks?showHidden=true",
-          'body': {
-            "showCompleted": true,
-            "showHidden": true
-          }
+          'path':PATH+'lists/'+tList.id+"/tasks?showHidden=true"
         }).then(res => {
           if (res.result.items) {
             res.result.items.forEach(task => {
               //console.log(task);
-              console.log(tList.title + " | " + task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id);
+              //console.log(tList.title + " | " + task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id);
 
-              $("<div class='task' id='"+task.id+"'>" +
+              // Add task to html
+              var classToAdd = 'task';
+              if (task.completed) {
+                classToAdd += " completed";
+              }
+              $("<div class='"+classToAdd+"' id='"+task.id+"'>" +
               task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id +
               "</div>").appendTo( $("#"+tList.id) );
 
@@ -254,6 +273,24 @@
     // Show the hidden-tasks button
     $("#tasklist-controls").css('display', DISPLAYMODE);
   }
+</script>
+
+<script>
+  // This is for getting the default sort-by method
+  var getUrlParameter = function getUrlParameter(sParam) {
+    var sPageURL = window.location.search.substring(1),
+        sURLVariables = sPageURL.split('&'),
+        sParameterName,
+        i;
+
+    for (i = 0; i < sURLVariables.length; i++) {
+        sParameterName = sURLVariables[i].split('=');
+
+        if (sParameterName[0] === sParam) {
+            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        }
+    }
+  };
 </script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
