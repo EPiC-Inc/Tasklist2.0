@@ -1,3 +1,18 @@
+
+
+
+
+
+
+
+
+
+
+<!--TODO: Store task in json so that it can be accessed outside of getTasks() -->
+
+
+
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,12 +24,21 @@
 <body>
   <p>There will be stuff here later</p>
   <p>But for now just this:</p> <br>
-  <button id="sign-in-or-out-button">Sign In</button> <br>
+  <button id="signin-button">Sign In</button> <br>
   <button id="revoke-access-button">Revoke Access</button> <br>
   <p id='auth-status'></p>
+  
+  <button id="hidden-tasks-button">Show Hidden Tasks</button>
+
+  <div id="main-tasks-div"></div>
 </body>
 
 <script>
+  var tasklists = {};
+  var showHiddenTasks = false;
+
+  // This was stolen from the Google documentation.
+  // Some of it was, anyway
   var GoogleAuth;
   var SCOPE = "https://www.googleapis.com/auth/tasks";
   var PATH = "https://www.googleapis.com/tasks/v1/";
@@ -35,8 +59,8 @@
     // Get API key and client ID from API Console.
     // 'scope' field specifies space-delimited list of access scopes.
     gapi.client.init({
-        'apiKey': 'AIzaSyCy3pMm8gYO90IJgAWN3jtQQaP8aLvX7QU',
-        'clientId': '933188172351-b6drqks64hs9g12eoaq6diu7omauq6n8.apps.googleusercontent.com',
+        'apiKey': atob('QUl6YVN5Q3kzcE1tOGdZTzkwSUpnQVdOM2p0UVFhUDhhTHZYN1FV'),
+        'clientId': atob("OTMzMTg4MTcyMzUxLWI2ZHJxa3M2NGhzOWcxMmVvYXE2ZGl1N29tYXVxNm44LmFwcHMuZ29vZ2xldXNlcmNvbnRlbnQuY29t"),
         'discoveryDocs': [discoveryUrl],
         'scope': SCOPE
     }).then(function () {
@@ -51,11 +75,21 @@
 
       // Call handleAuthClick function when user clicks on
       //      "Sign In/Authorize" button.
-      $('#sign-in-or-out-button').click(function() {
+      $('#signin-button').click(function() {
         handleAuthClick();
       });
       $('#revoke-access-button').click(function() {
         revokeAccess();
+      });
+
+      $("#hidden-tasks-button").click(function() {
+        if (showHiddenTasks) {
+          $('#hidden-tasks-button').html("Hide Tasks");
+          showHiddenTasks = false;
+        } else {
+          $('#hidden-tasks-button').html("Show Hidden Tasks");
+          showHiddenTasks = true;
+        }
       });
     });
   }
@@ -64,6 +98,7 @@
     if (GoogleAuth.isSignedIn.get()) {
       // User is authorized and has clicked "Sign out" button.
       GoogleAuth.signOut();
+      clearTasks();
     } else {
       // User is not signed in. Start Google auth flow.
       GoogleAuth.signIn().then(function() {
@@ -80,35 +115,99 @@
     GoogleAuth.disconnect();
   }
 
+  function clearTasks() {
+    tasks = {};
+    $("#main-tasks-div").html("");
+  }
+
   function setSigninStatus(isSignedIn) {
     var user = GoogleAuth.currentUser.get();
     var isAuthorized = user.hasGrantedScopes(SCOPE);
+    profile = user.getBasicProfile();
+
     if (isAuthorized) {
-      $('#sign-in-or-out-button').html('Sign out');
+      $('#signin-button').html('Sign out');
       $('#revoke-access-button').css('display', 'inline-block');
-      $('#auth-status').html('You are currently signed in and have granted ' +
-          'access to this app.');
+      $('#auth-status').html('Welcome, ' + profile.getGivenName() + "! (" + profile.getEmail().substring(0, 5) + "*".repeat(profile.getEmail().length - 5) + ")");
+      $("#hidden-tasks-button").css('display', 'inline-block');
       
       //ANCHOR: This runs on sign in, even between page loads
-      // Collect user's task lists
-      gapi.client.request({
-        'path':PATH+'users/@me/lists'
-      }).then(res => {
-        res.result.items.forEach(tList => {
-          console.log(tList.title)
-        });
-      });
+      getTasks();
 
     } else {
-      $('#sign-in-or-out-button').html('Sign In/Authorize');
+      $('#signin-button').html('Sign In/Authorize');
       $('#revoke-access-button').css('display', 'none');
       $('#auth-status').html('You have not authorized this app or you are ' +
           'signed out.');
+      $("#hidden-tasks-button").css('display', 'none');
     }
   }
 
   function updateSigninStatus(isSignedIn) {
     setSigninStatus();
+  }
+
+
+
+  //ANCHOR Get tasks
+  function getTasks() {
+    //Clear HTML of tasks
+    clearTasks();
+
+    // Collect user's task lists
+    gapi.client.request({
+      'path':PATH+'users/@me/lists'
+    }).then(res => {
+      // For each tasklist, write out some details to console
+      res.result.items.forEach(tList => {
+        console.log(tList.title + " | " + tList.id);
+
+        // Append a visual representation of the list to main-tasks-div
+        $("<div class='tasklist' id='"+tList.id+"'>" +
+        "<p class='tasklist-name'>"+tList.title+"</p>" +
+        "</div>").appendTo( $("#main-tasks-div") );
+
+        // Add a copy of the tasklist to tasks
+        tasklists[tList.id] = {
+          title: tList.title,
+          tasks: {}
+        };
+        
+        // For each task in the tasklist, write out some details to console
+        gapi.client.request({
+          'path':PATH+'lists/'+tList.id+"/tasks?showHidden=true",
+          'body': {
+            "showCompleted": true,
+            "showHidden": true,
+            "showDeleted": true
+          }
+        }).then(res => {
+          if (res.result.items) {
+            res.result.items.forEach(task => {
+              //console.log(task);
+              console.log(tList.title + " | " + task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id);
+
+              $("<div class='task' id='"+task.id+"'>" +
+              task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id +
+              "</div>").appendTo( $("#"+tList.id) );
+
+              // Add task to appropriate list
+              tasklists[tList.id].tasks[task.id] = {
+                title: task.title,
+                dueDate: task.due,
+                status: task.status,
+                hidden: task.hidden,
+                completed: task.completed,
+              };
+
+              if (task.hidden) {
+                $("#"+task.id).css('display', 'none');
+              }
+            });
+          }
+        });
+      });
+    });
   }
 </script>
 
@@ -118,3 +217,16 @@
   onreadystatechange="if (this.readyState === 'complete') this.onload()">
 </script>
 </html>
+
+<!--
+// This is to mark all tasks as undone...
+gapi.client.request({
+  'path':PATH+"lists/"+tList.id+"/tasks/"+task.id,
+  'method': 'PATCH',
+  "body": {
+    'status':"needsAction"
+  }
+  }).then(res => {
+    console.log(res);
+  });
+-->
