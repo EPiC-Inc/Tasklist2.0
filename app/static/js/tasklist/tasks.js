@@ -87,6 +87,12 @@ function initClient() {
       $("#main-tasks-div").addClass($("#sort-by").val());
     });
 
+    //ANCHOR: Theme selection
+    $("#theme").change(function() {
+      $("html").removeClass();
+      $("html").addClass($("#theme").val());
+    });
+
   });
 }
 
@@ -122,6 +128,9 @@ function setSigninStatus(isSignedIn) {
     getTasks();
     if (getUrlParameter("display")) {
       $("#sort-by").val(getUrlParameter("display")).change();
+    }
+    if (getUrlParameter("theme")) {
+      $("#theme").val(getUrlParameter("theme")).change();
     }
 
   } else {

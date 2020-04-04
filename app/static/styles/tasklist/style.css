@@ -2,6 +2,35 @@
     font-family: "Lato", sans-serif;
 }
 
+/*ANCHOR: THEMES*/
+/* For the Light theme*/
+.theme-light * {
+    --complete-task-border-color: darkgreen;
+}
+.theme-light body {
+    background-color: aliceblue;
+}
+.theme-light .task {
+    background-color: #e4ecec;
+}
+
+/* For the Dark theme */
+.theme-dark *{
+    color: #dddddd;
+    --complete-task-border-color: lightgreen;
+}
+.theme-dark button, .theme-dark select {
+    background-color: #111111;
+    border-color: #222222;
+}
+.theme-dark body {
+    background-color: #333333;
+}
+.theme-dark .task {
+    background-color: #222222;
+}
+
+/*ANCHOR: Sort styles*/
 /* For the Default sort-by style */
 .default .tasklist {
     clear: left;
@@ -24,16 +53,26 @@
     height: 14px;
     margin-right: 5px;
     width: 14px;
+    vertical-align: middle;
+}
+.default .task span {
+    vertical-align: middle;
 }
 
 .default .task.completed {
-    border-color: lightgreen;
+    border-color: var(--complete-task-border-color);
 }
 .default .task.completed::before {
-    background-color: lightgreen;
+    background-color: var(--complete-task-border-color);
 }
 
 /* For the Show All style */
-.all-in-one .tasklist-name {
+.show-all .tasklist-name {
     display: none;
+}
+
+/* For the Clustered style */
+.clustered .task {
+    clear: none;
+    display: inline;
 }
