@@ -53,9 +53,9 @@ function initClient() {
         for (var taskId in tasklists[id].tasks) {
           var currentTask = tasklists[id].tasks[taskId]
           //console.log(currentTask);
-          if (currentTask.hidden & showHiddenTasks) {
+          if (showHiddenTasks) {
             $("#"+taskId).css("display", DISPLAYMODE);
-          } else if (currentTask.hidden & !showHiddenTasks) {
+          } else if ( (currentTask.completed | currentTask.hidden) & !showHiddenTasks) {
             $("#"+taskId).css("display", "none");
           }
         }
@@ -182,15 +182,15 @@ function getTasks() {
         if (res.result.items) {
           res.result.items.forEach(task => {
             //console.log(task);
-            //console.log(tList.title + " | " + task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id);
+            console.log(tList.title + " | " + task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id);
 
             // Add task to html
             var classToAdd = 'task';
             if (task.completed) {
               classToAdd += " completed";
             }
-            $(`<div class='${classToAdd}' id='${task.id}'>${createSpan(task.title, 'taskName')} | ${createSpan(task.due, "taskDueDate")} | ${createSpan(task.completed, 
-            "taskCompletedDate")}</div>`).appendTo( $("#"+tList.id) );
+            $(`<div class='${classToAdd}' id='${task.id}'>`/*${createSpan(task.title, 'taskName')} | ${createSpan(task.due, "taskDueDate")} | ${createSpan(task.completed, 
+            "taskCompletedDate")}*/+tList.title + " | " + task.title + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id+`</div>`).appendTo( $("#"+tList.id) );
 
             // Add task to appropriate list
             tasklists[tList.id].tasks[task.id] = {
@@ -201,7 +201,7 @@ function getTasks() {
               completed: task.completed,
             };
 
-            if (task.hidden) {
+            if (task.completed) {
               $("#"+task.id).css('display', 'none');
             }
           });
@@ -215,6 +215,20 @@ function getTasks() {
 }
 
 //ANCHOR: Small utility functions
+function markTaskDone(tListId, taskId, completed=true) {
+  // Mark tasks as completed or not completed
+  gapi.client.request({
+    'path':PATH+"lists/"+tList.id+"/tasks/"+task.id,
+    'method': 'PATCH',
+    "body": {
+      'status':"completed",
+      'hidden': true
+    }
+  }).then(res => {
+    console.log(res);
+  });
+}
+
 function createSpan(thingToPutInSpan, spanClass=undefined) {
   if (spanClass) {
     return "<span class='"+spanClass+"'>"+thingToPutInSpan+"</span>";

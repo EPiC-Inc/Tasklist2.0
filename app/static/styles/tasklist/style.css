@@ -38,7 +38,7 @@
 
 .default .task {
     border: 4px solid darkred;
-    border-radius: 25px;
+    border-radius: 20px;
     clear: left;
     display: block;
     float: left;

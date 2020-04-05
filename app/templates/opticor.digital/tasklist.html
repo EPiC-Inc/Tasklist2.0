@@ -70,14 +70,27 @@
 </html>
 
 <!--
-// This is to mark all tasks as undone...
+// This is to mark tasks as undone...
 gapi.client.request({
   'path':PATH+"lists/"+tList.id+"/tasks/"+task.id,
   'method': 'PATCH',
   "body": {
-    'status':"needsAction"
+    'status':"needsAction",
+    'hidden': false
   }
-  }).then(res => {
-    console.log(res);
-  });
+}).then(res => {
+  console.log(res);
+});
+
+// Mark tasks as completed
+gapi.client.request({
+  'path':PATH+"lists/"+tList.id+"/tasks/"+task.id,
+  'method': 'PATCH',
+  "body": {
+    'status':"completed",
+    'hidden': true
+  }
+}).then(res => {
+  console.log(res);
+});
 -->
