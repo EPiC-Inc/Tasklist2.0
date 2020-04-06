@@ -1,0 +1,20 @@
+{
+  "name": "tasklist2.0",
+  "version": "1.0.0",
+  "description": "Tasklist using Google OAuth",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EPiC-Inc/Tasklist2.0.git"
+  },
+  "author": "EPiC_Inc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EPiC-Inc/Tasklist2.0/issues"
+  },
+  "homepage": "https://github.com/EPiC-Inc/Tasklist2.0#readme"
+}
