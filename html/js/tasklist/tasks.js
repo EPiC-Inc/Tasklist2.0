@@ -81,18 +81,6 @@ function initClient() {
       }
     });
 
-    //ANCHOR: Sort-by selection
-    $("#sort-by").change(function() {
-      $("#main-tasks-div").removeClass();
-      $("#main-tasks-div").addClass($("#sort-by").val());
-    });
-
-    //ANCHOR: Theme selection
-    $("#theme").change(function() {
-      $("html").removeClass();
-      $("html").addClass($("#theme").val());
-    });
-
   });
 }
 
@@ -126,12 +114,6 @@ function setSigninStatus(isSignedIn) {
     
     //ANCHOR: This runs on sign in, even between page loads
     getTasks();
-    if (getUrlParameter("display")) {
-      $("#sort-by").val(getUrlParameter("display")).change();
-    }
-    if (getUrlParameter("theme")) {
-      $("#theme").val(getUrlParameter("theme")).change();
-    }
 
   } else {
     $('#signin-button').html('Sign In/Authorize');
@@ -182,7 +164,7 @@ function getTasks() {
         if (res.result.items) {
           res.result.items.forEach(task => {
             //console.log(task);
-            console.log(tList.title + " | " + task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id);
+            //console.log(tList.title + " | " + task.title + " | " + task.due + " | " + task.status + " | " + task.hidden + " | " + task.completed + " | " + task.id);
 
             // Add task to html
             var classToAdd = 'task';
@@ -212,6 +194,8 @@ function getTasks() {
 
   // Show the hidden-tasks button
   $("#tasklist-controls").css('display', DISPLAYMODE);
+
+  parseUrlVars();
 }
 
 //ANCHOR: Small utility functions
@@ -252,4 +236,26 @@ function revokeAccess() {
 function clearTasks() {
   tasks = {};
   $("#main-tasks-div").html("");
+}
+
+function parseUrlVars() {
+  //ANCHOR: Sort-by selection
+  $("#sort-by").change(function() {
+    $("#main-tasks-div").removeClass();
+    $("#main-tasks-div").addClass($("#sort-by").val());
+  });
+
+  //ANCHOR: Theme selection
+  $("#theme").change(function() {
+    $("html").removeClass();
+    $("html").addClass($("#theme").val());
+  });
+
+  if (getUrlParameter("display")) {
+    $("#sort-by").val(getUrlParameter("display")).change();
+  }
+  if (getUrlParameter("theme")) {
+    $("#theme").val(getUrlParameter("theme")).change();
+    console.log(getUrlParameter("theme"));
+  }
 }
